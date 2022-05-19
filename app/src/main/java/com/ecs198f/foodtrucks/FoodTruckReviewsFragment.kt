@@ -78,7 +78,24 @@ class FoodTruckReviewsFragment(val recyclerViewAdapter: FoodTruckReviewRecyclerA
                                 Log.i("test","${account!!.idToken}" )
                                 binding.postEditText.text!!.clear()
                                 binding.postEditText.clearFocus()
-                                //TODO update recycler view
+                                // Posting works, now we want to update the review list
+                                //This was supposed to reload the review with another call but now it's not signing in...
+                                (requireActivity() as FoodTruckDetailFragment).apply {
+                                    foodTruckService.listFoodReviews(recyclerViewAdapter.getTruckID()).enqueue(object : Callback<List<FoodReview>> {
+                                        override fun onResponse(
+                                            call: Call<List<FoodReview>>,
+                                            response: Response<List<FoodReview>>
+                                        ) {
+                                            Log.i("GELP2", response.body()!!.toString())
+                                            recyclerViewAdapterReview.updateItems(response.body()!!)
+                                        }
+
+                                        override fun onFailure(call: Call<List<FoodReview>>, t: Throwable) {
+                                            throw t
+                                        }
+                                    })
+                                }
+
                             }
 
                             override fun onFailure(call: Call<Unit>, t: Throwable) {
